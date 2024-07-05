@@ -233,6 +233,10 @@ class S3Client extends AwsClient implements S3ClientInterface
 
     public static function getArguments()
     {
+        $bucket_endpoint = true;
+        $use_path_style_endpoint = true;
+        $disable_multiregion_access_points = true;
+
         $args = parent::getArguments();
         $args['retries']['fn'] = [__CLASS__, '_applyRetryConfig'];
         $args['api_provider']['fn'] = [__CLASS__, '_applyApiProvider'];
@@ -245,6 +249,7 @@ class S3Client extends AwsClient implements S3ClientInterface
                     . 'bucket endpoint rather than create an endpoint as a '
                     . 'result of injecting the bucket into the URL. This '
                     . 'option is useful for interacting with CNAME endpoints.',
+                'default' => true,
             ],
             'use_arn_region' => [
                 'type'    => 'config',
@@ -304,8 +309,10 @@ class S3Client extends AwsClient implements S3ClientInterface
      *   interacting with CNAME endpoints. Note: if you are using version 2.243.0
      *   and above and do not expect the bucket name to appear in the host, you will
      *   also need to set `use_path_style_endpoint` to `true`.
+     * 
      * - calculate_md5: (bool) Set to false to disable calculating an MD5
      *   for all Amazon S3 signed uploads.
+     * 
      * - s3_us_east_1_regional_endpoint:
      *   (Aws\S3\RegionalEndpoint\ConfigurationInterface|Aws\CacheInterface\|callable|string|array)
      *   Specifies whether to use regional or legacy endpoints for the us-east-1
@@ -315,11 +322,13 @@ class S3Client extends AwsClient implements S3ClientInterface
      *   `regional`, or an associative array with the following keys:
      *   endpoint_types: (string)  Set to `legacy` or `regional`, defaults to
      *   `legacy`
+     * 
      * - use_accelerate_endpoint: (bool) Set to true to send requests to an S3
      *   Accelerate endpoint by default. Can be enabled or disabled on
      *   individual operations by setting '@use_accelerate_endpoint' to true or
      *   false. Note: you must enable S3 Accelerate on a bucket before it can be
      *   accessed via an Accelerate endpoint.
+     * 
      * - use_arn_region: (Aws\S3\UseArnRegion\ConfigurationInterface,
      *   Aws\CacheInterface, bool, callable) Set to true to enable the client
      *   to use the region from a supplied ARN argument instead of the client's
@@ -328,16 +337,19 @@ class S3Client extends AwsClient implements S3ClientInterface
      *   a Configuration object, or a boolean value. Defaults to false (i.e.
      *   the SDK will not follow the ARN region if it conflicts with the client
      *   region and instead throw an error).
+     * 
      * - use_dual_stack_endpoint: (bool) Set to true to send requests to an S3
      *   Dual Stack endpoint by default, which enables IPv6 Protocol.
      *   Can be enabled or disabled on individual operations by setting
      *   '@use_dual_stack_endpoint\' to true or false. Note:
      *   you cannot use it together with an accelerate endpoint.
+     * 
      * - use_path_style_endpoint: (bool) Set to true to send requests to an S3
      *   path style endpoint by default.
      *   Can be enabled or disabled on individual operations by setting
      *   '@use_path_style_endpoint\' to true or false. Note:
      *   you cannot use it together with an accelerate endpoint.
+     * 
      * - disable_multiregion_access_points: (bool) Set to true to disable
      *   sending multi region requests.  They are enabled by default.
      *   Can be enabled or disabled on individual operations by setting
